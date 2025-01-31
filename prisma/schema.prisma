@@ -1,0 +1,78 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Company {
+  id            String    @id @default(cuid())
+  name          String
+  phoneNumber   String?
+  timezone      String    @default("UTC")
+  businessHours Json      // Stores opening hours for each day
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  settings      Settings?
+  callFlows     CallFlow[]
+  knowledge     KnowledgeItem[]
+  calls         Call[]
+}
+
+model Settings {
+  id                    String  @id @default(cuid())
+  companyId            String  @unique
+  company              Company @relation(fields: [companyId], references: [id])
+  greeting             String?
+  voiceType            String  @default("neutral")
+  confidenceThreshold  Float   @default(0.7)
+  recordCalls          Boolean @default(false)
+  autoTranscribe       Boolean @default(false)
+  notificationEmail    String?
+  missedCallAlerts     Boolean @default(true)
+  voicemailAlerts      Boolean @default(true)
+  weeklyReports        Boolean @default(true)
+}
+
+model CallFlow {
+  id        String   @id @default(cuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  name      String
+  steps     Json     // Stores the flow configuration
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model KnowledgeItem {
+  id        String   @id @default(cuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  type      String   // 'faq', 'policy', 'script', etc.
+  question  String?
+  answer    String
+  category  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Call {
+  id           String    @id @default(cuid())
+  companyId    String
+  company      Company   @relation(fields: [companyId], references: [id])
+  callSid      String    @unique // Twilio Call SID
+  from         String
+  to           String
+  status       String
+  duration     Int?
+  recordingUrl String?
+  transcript   String?
+  aiHandled    Boolean   @default(false)
+  handoffTime  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+

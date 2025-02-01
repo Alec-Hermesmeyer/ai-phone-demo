@@ -5,6 +5,7 @@ import { Sidebar } from "../components/sidebar"
 import { Header } from "../components/header"
 import { Toaster } from "../components/ui/toaster"
 import type React from "react" // Added import for React
+import Script from "next/script"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -16,6 +17,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
+      <head>
+        <Script src="//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js" strategy="beforeInteractive" />
+      </head>
         <body className={inter.className}>
           <div className="flex h-screen">
             <Sidebar />

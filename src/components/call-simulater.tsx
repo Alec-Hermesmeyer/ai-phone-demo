@@ -7,23 +7,54 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Input } from "../components/ui/input"
 import { useChat } from "ai/react"
 import { searchDocuments } from "@/lib/api"
+import { formatKnowledgeResponse } from "@/lib/format-response"
+
+interface Message {
+  id: string
+  role: "user" | "assistant"
+  content: string
+}
 
 export function CallSimulator() {
   const [isCallActive, setIsCallActive] = useState(false)
   const [isSearching, setIsSearching] = useState(false)
-  const { messages, input, handleInputChange, setMessages } = useChat()
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!input.trim()) return
+    if (!input.trim() || isSearching) return
+
+    const userMessage = input
+    setInput("") // Clear input immediately
 
     try {
       setIsSearching(true)
       // Add user message immediately
-      setMessages((current) => [...current, { id: Date.now().toString(), role: "user", content: input }])
+      setMessages((current) => [
+        ...current,
+        {
+          id: Date.now().toString(),
+          role: "user",
+          content: userMessage,
+        },
+      ])
 
       // Search for relevant documents
-      const searchResults = await searchDocuments(input)
+      const searchResults = await searchDocuments(userMessage)
+
+      if (searchResults.results.length === 0) {
+        setMessages((current) => [
+          ...current,
+          {
+            id: Date.now().toString(),
+            role: "assistant",
+            content:
+              "I apologize, but I don't have specific information about that. Let me transfer you to a human agent who can help you better.",
+          },
+        ])
+        return
+      }
 
       // Format the context from search results
       const context = searchResults.results
@@ -33,26 +64,50 @@ export function CallSimulator() {
         })
         .join("\n\n")
 
-      // Generate AI response using the search results
-      const aiResponse = searchResults.results.length
-        ? `Based on our information:\n\n${context}`
-        : "I apologize, but I don't have specific information about that. Let me transfer you to a human agent who can help you better."
+      // Format the response using AI
+      const formattedResponse = await formatKnowledgeResponse(context, userMessage)
 
       // Add AI response
-      setMessages((current) => [...current, { id: Date.now().toString(), role: "assistant", content: aiResponse }])
+      setMessages((current) => [
+        ...current,
+        {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: formattedResponse,
+        },
+      ])
     } catch (error) {
+      console.error("Error in call simulator:", error)
       setMessages((current) => [
         ...current,
         {
           id: Date.now().toString(),
           role: "assistant",
           content:
-            "I apologize, but I'm having trouble accessing the knowledge base. Let me transfer you to a human agent.",
+            "I apologize, but I'm having trouble accessing the information. Let me transfer you to a human agent.",
         },
       ])
     } finally {
       setIsSearching(false)
     }
+  }
+
+  const handleStartCall = () => {
+    setIsCallActive(true)
+    setMessages([
+      {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: "Hello! Thank you for calling. How can I assist you today?",
+      },
+    ])
+  }
+
+  const handleEndCall = () => {
+    setIsCallActive(false)
+    setMessages([])
+    setInput("")
+    setIsSearching(false)
   }
 
   return (
@@ -64,7 +119,7 @@ export function CallSimulator() {
       <CardContent>
         <div className="space-y-4">
           {!isCallActive ? (
-            <Button className="w-full" size="lg" onClick={() => setIsCallActive(true)}>
+            <Button className="w-full" size="lg" onClick={handleStartCall}>
               <Phone className="mr-2 h-4 w-4" />
               Start Test Call
             </Button>
@@ -73,7 +128,7 @@ export function CallSimulator() {
               <div className="h-[400px] border rounded-lg p-4 overflow-y-auto">
                 {messages.map((message) => (
                   <div key={message.id} className={`flex gap-2 mb-4 ${message.role === "user" ? "justify-end" : ""}`}>
-                    {message.role !== "user" && <Phone className="h-8 w-8 p-2 border rounded-full" />}
+                    {message.role !== "user" && <Phone className="h-8 w-8 p-2 border rounded-full shrink-0" />}
                     <div
                       className={`rounded-lg px-4 py-2 max-w-[80%] ${
                         message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
@@ -81,7 +136,7 @@ export function CallSimulator() {
                     >
                       {message.content}
                     </div>
-                    {message.role === "user" && <User className="h-8 w-8 p-2 border rounded-full" />}
+                    {message.role === "user" && <User className="h-8 w-8 p-2 border rounded-full shrink-0" />}
                   </div>
                 ))}
               </div>
@@ -90,7 +145,7 @@ export function CallSimulator() {
                 <Input
                   placeholder="Type your message..."
                   value={input}
-                  onChange={handleInputChange}
+                  onChange={(e) => setInput(e.target.value)}
                   disabled={isSearching}
                 />
                 <Button type="submit" disabled={isSearching}>
@@ -98,7 +153,7 @@ export function CallSimulator() {
                 </Button>
               </form>
 
-              <Button variant="destructive" className="w-full" onClick={() => setIsCallActive(false)}>
+              <Button variant="destructive" className="w-full" onClick={handleEndCall}>
                 End Call
               </Button>
             </div>
@@ -108,4 +163,3 @@ export function CallSimulator() {
     </Card>
   )
 }
-

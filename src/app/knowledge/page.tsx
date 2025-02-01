@@ -12,6 +12,8 @@ import { useToast } from "../../components/ui/use-toast"
 import { FileUpload } from "../../components/file-upload"
 import { processPDF, processCSV, exportFAQs } from "@/lib/process-files"
 import { addDocument } from "@/lib/api"
+import { KnowledgeBase } from "../../components/knowledge-base"
+import { CallSimulator } from "../../components/call-simulater"
 
 interface FAQ {
   question: string
@@ -20,7 +22,7 @@ interface FAQ {
 }
 
 export default function KnowledgePage() {
-  const [activeTab, setActiveTab] = useState("faqs")
+  const [activeTab, setActiveTab] = useState("knowledge")
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [newFAQ, setNewFAQ] = useState<FAQ>({
     question: "",
@@ -72,86 +74,109 @@ export default function KnowledgePage() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Knowledge Base</CardTitle>
-          <CardDescription>Manage your AI system's knowledge and responses</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="faqs">FAQs</TabsTrigger>
-              <TabsTrigger value="docs">Documents</TabsTrigger>
-            </TabsList>
+    <div className="container mx-auto py-6 space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Knowledge Base</h1>
+        <p className="text-muted-foreground">Manage and test your AI phone system's knowledge</p>
+      </div>
 
-            <TabsContent value="faqs" className="space-y-4">
-              <div className="flex justify-between">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="knowledge">Knowledge Base</TabsTrigger>
+          <TabsTrigger value="import">Import & Export</TabsTrigger>
+          <TabsTrigger value="simulator">Call Simulator</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="knowledge">
+          <KnowledgeBase />
+        </TabsContent>
+
+        <TabsContent value="import" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Import Documents</CardTitle>
+              <CardDescription>Upload PDFs or CSV files to add to your knowledge base</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <Label>PDF Documents</Label>
                 <FileUpload
                   accept={{
-                    "text/csv": [".csv"],
-                    "application/json": [".json"],
+                    "application/pdf": [".pdf"],
                   }}
-                  onUpload={processCSV}
+                  maxSize={10485760} // 10MB
+                  onUpload={processPDF}
                 />
-                <Button variant="outline" onClick={() => exportFAQs([])}>
-                  <Download className="mr-2 h-4 w-4" />
-                  Export FAQs
-                </Button>
               </div>
 
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="question">Question</Label>
-                      <Input
-                        id="question"
-                        placeholder="Enter frequently asked question"
-                        value={newFAQ.question}
-                        onChange={(e) => setNewFAQ((prev) => ({ ...prev, question: e.target.value }))}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="answer">Answer</Label>
-                      <Textarea
-                        id="answer"
-                        placeholder="Enter the answer"
-                        value={newFAQ.answer}
-                        onChange={(e) => setNewFAQ((prev) => ({ ...prev, answer: e.target.value }))}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="categories">Categories</Label>
-                      <Input
-                        id="categories"
-                        placeholder="Add categories (comma-separated)"
-                        value={newFAQ.categories}
-                        onChange={(e) => setNewFAQ((prev) => ({ ...prev, categories: e.target.value }))}
-                      />
-                    </div>
+              <div className="space-y-4">
+                <Label>FAQ Import/Export</Label>
+                <div className="flex justify-between gap-4">
+                  <div className="flex-1">
+                    <FileUpload
+                      accept={{
+                        "text/csv": [".csv"],
+                        "application/json": [".json"],
+                      }}
+                      onUpload={processCSV}
+                    />
                   </div>
-                </CardContent>
-              </Card>
+                  <Button variant="outline" onClick={() => exportFAQs([])}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Export FAQs
+                  </Button>
+                </div>
+              </div>
 
-              <Button className="w-full" onClick={handleSubmitFAQ} disabled={isSubmitting}>
-                {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
-                Add FAQ
-              </Button>
-            </TabsContent>
+              <div className="space-y-4">
+                <Label>Manual FAQ Entry</Label>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="question">Question</Label>
+                        <Input
+                          id="question"
+                          placeholder="Enter frequently asked question"
+                          value={newFAQ.question}
+                          onChange={(e) => setNewFAQ((prev) => ({ ...prev, question: e.target.value }))}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="answer">Answer</Label>
+                        <Textarea
+                          id="answer"
+                          placeholder="Enter the answer"
+                          value={newFAQ.answer}
+                          onChange={(e) => setNewFAQ((prev) => ({ ...prev, answer: e.target.value }))}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="categories">Categories</Label>
+                        <Input
+                          id="categories"
+                          placeholder="Add categories (comma-separated)"
+                          value={newFAQ.categories}
+                          onChange={(e) => setNewFAQ((prev) => ({ ...prev, categories: e.target.value }))}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <TabsContent value="docs" className="space-y-4">
-              <FileUpload
-                accept={{
-                  "application/pdf": [".pdf"],
-                }}
-                maxSize={10485760} // 10MB
-                onUpload={processPDF}
-              />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+                <Button className="w-full" onClick={handleSubmitFAQ} disabled={isSubmitting}>
+                  {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Plus className="mr-2 h-4 w-4" />}
+                  Add FAQ
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="simulator">
+          <CallSimulator />
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

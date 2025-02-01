@@ -1,8 +1,15 @@
+import { createOpenAI } from "@ai-sdk/openai"
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL
 
 if (!API_URL) {
   throw new Error("NEXT_PUBLIC_API_URL environment variable is not set")
 }
+
+// Initialize OpenAI client
+const openaiClient = createOpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
 
 export interface Document {
   id: string
@@ -62,4 +69,6 @@ export async function deleteDocument(id: string): Promise<void> {
     throw new Error("Failed to delete document")
   }
 }
+
+export { openaiClient }
 

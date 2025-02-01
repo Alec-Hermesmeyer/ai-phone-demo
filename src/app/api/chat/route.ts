@@ -1,5 +1,9 @@
-import { openai } from "@ai-sdk/openai"
+import { createOpenAI } from "@ai-sdk/openai"
 import { streamText } from "ai"
+
+const openaiClient = createOpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
 
 export async function POST(req: Request) {
   const { messages } = await req.json()
@@ -14,7 +18,7 @@ export async function POST(req: Request) {
   }
 
   const result = streamText({
-    model: openai("gpt-4-turbo"),
+    model: openaiClient("gpt-4-turbo"),
     messages: [systemMessage, ...messages],
   })
 

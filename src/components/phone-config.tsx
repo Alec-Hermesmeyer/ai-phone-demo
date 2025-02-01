@@ -21,7 +21,7 @@ export function PhoneConfig() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center">
@@ -49,15 +49,25 @@ export function PhoneConfig() {
                 </div>
               </CardContent>
             </Card>
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col items-center text-center">
+                  <Bot className="h-8 w-8 mb-2" />
+                  <h3 className="font-medium">Voice Synthesis</h3>
+                  <p className="text-sm text-muted-foreground">Natural-sounding AI voices</p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </CardContent>
       </Card>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="knowledge">Knowledge Base</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
           <TabsTrigger value="simulator">Call Simulator</TabsTrigger>
+          <TabsTrigger value="speech">Speech Test</TabsTrigger>
         </TabsList>
         <TabsContent value="knowledge">
           <KnowledgeBase />
@@ -68,8 +78,10 @@ export function PhoneConfig() {
         <TabsContent value="simulator">
           <CallSimulator />
         </TabsContent>
+        <TabsContent value="speech">
+          <SpeechTest />
+        </TabsContent>
       </Tabs>
     </div>
   )
 }
-

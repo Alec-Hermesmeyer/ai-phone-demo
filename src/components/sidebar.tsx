@@ -1,6 +1,6 @@
 "use client"
 
-import { Home, Phone, Settings, Users, BarChart, BookText, Headphones } from "lucide-react"
+import { Home, Phone, Settings, Users, BarChart, BookText, Headphones, Bot } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "./ui/button"
 import { usePathname } from "next/navigation"
@@ -31,6 +31,11 @@ const routes = [
     label: "Analytics",
     icon: BarChart,
     href: "/analytics",
+  },
+  {
+    label: "AI Voice Demos",
+    icon: Bot,
+    href: "/demos",
   },
   {
     label: "Settings",

@@ -1,24 +1,41 @@
 "use client"
 
-import { useState, useRef } from "react"
-import { Mic, Square, Loader2 } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { Mic, Square, Loader2, Copy, Check } from "lucide-react"
 import { Button } from "./ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { Label } from "./ui/label"
 import { useToast } from "./ui/use-toast"
+import { AudioVisualizer } from "./audio-visualizer"
+
+const EXAMPLE_PHRASES = [
+  "The quick brown fox jumps over the lazy dog.",
+  "Hello, my name is Sarah and I'd like to book a tour.",
+  "What are your business hours and location?",
+  "Could you tell me about your refund policy?",
+]
 
 export function SpeechToTextDemo() {
   const [isRecording, setIsRecording] = useState(false)
   const [transcript, setTranscript] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isCopied, setIsCopied] = useState(false)
+  const [stream, setStream] = useState<MediaStream>()
   const mediaRecorder = useRef<MediaRecorder | null>(null)
   const audioChunks = useRef<Blob[]>([])
   const { toast } = useToast()
 
+  useEffect(() => {
+    return () => {
+      stream?.getTracks().forEach((track) => track.stop())
+    }
+  }, [stream])
+
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      mediaRecorder.current = new MediaRecorder(stream)
+      const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      setStream(audioStream)
+      mediaRecorder.current = new MediaRecorder(audioStream)
       audioChunks.current = []
 
       mediaRecorder.current.ondataavailable = (event) => {
@@ -44,7 +61,8 @@ export function SpeechToTextDemo() {
   const stopRecording = () => {
     if (mediaRecorder.current && isRecording) {
       mediaRecorder.current.stop()
-      mediaRecorder.current.stream.getTracks().forEach((track) => track.stop())
+      stream?.getTracks().forEach((track) => track.stop())
+      setStream(undefined)
       setIsRecording(false)
     }
   }
@@ -75,6 +93,24 @@ export function SpeechToTextDemo() {
     }
   }
 
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(transcript)
+      setIsCopied(true)
+      setTimeout(() => setIsCopied(false), 2000)
+      toast({
+        title: "Copied",
+        description: "Text copied to clipboard",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to copy text",
+        variant: "destructive",
+      })
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -82,29 +118,40 @@ export function SpeechToTextDemo() {
         <CardDescription>Convert speech to text using OpenAI Whisper</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="flex justify-center">
-          <Button
-            size="lg"
-            variant={isRecording ? "destructive" : "default"}
-            onClick={isRecording ? stopRecording : startRecording}
-            disabled={isProcessing}
-          >
-            {isRecording ? (
-              <>
-                <Square className="mr-2 h-4 w-4" />
-                Stop Recording
-              </>
-            ) : (
-              <>
-                <Mic className="mr-2 h-4 w-4" />
-                Start Recording
-              </>
-            )}
-          </Button>
+        <div className="space-y-4">
+          <div className="flex justify-center">
+            <Button
+              size="lg"
+              variant={isRecording ? "destructive" : "default"}
+              onClick={isRecording ? stopRecording : startRecording}
+              disabled={isProcessing}
+            >
+              {isRecording ? (
+                <>
+                  <Square className="mr-2 h-4 w-4" />
+                  Stop Recording
+                </>
+              ) : (
+                <>
+                  <Mic className="mr-2 h-4 w-4" />
+                  Start Recording
+                </>
+              )}
+            </Button>
+          </div>
+
+          {isRecording && stream && <AudioVisualizer stream={stream} isRecording={isRecording} />}
         </div>
 
         <div className="space-y-2">
-          <Label>Transcript</Label>
+          <div className="flex items-center justify-between">
+            <Label>Transcript</Label>
+            {transcript && (
+              <Button variant="ghost" size="sm" className="h-8 px-2" onClick={copyToClipboard}>
+                {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </Button>
+            )}
+          </div>
           <div className="relative rounded-md border p-4 min-h-[100px]">
             {isProcessing ? (
               <div className="absolute inset-0 flex items-center justify-center bg-background/80">
@@ -113,6 +160,22 @@ export function SpeechToTextDemo() {
             ) : (
               transcript || "Record something..."
             )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label>Example Phrases</Label>
+          <div className="grid gap-2">
+            {EXAMPLE_PHRASES.map((phrase, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                className="justify-start h-auto whitespace-normal"
+                onClick={() => setTranscript(phrase)}
+              >
+                {phrase}
+              </Button>
+            ))}
           </div>
         </div>
       </CardContent>

@@ -78,11 +78,11 @@ export async function POST(req: Request) {
       
       // Gather next response
       const gather = twiml.gather({
-        input: 'speech',
-        action: '/api/handle-response',
-        method: 'POST',
-        speechTimeout: 'auto',
-        language: 'en-US',
+        input: ["speech"], // Wrap in array
+        action: "/api//handle-response",
+        method: "POST",
+        speechTimeout: "auto",
+        language: "en-US",
       })
     }
 

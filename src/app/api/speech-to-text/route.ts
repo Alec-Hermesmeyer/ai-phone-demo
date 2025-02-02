@@ -8,11 +8,14 @@ const openai = new OpenAI({
 export async function POST(req: Request) {
   try {
     const formData = await req.formData()
-    const file = formData.get("file") as Blob
+    const blob = formData.get("file") as Blob
 
-    if (!file) {
+    if (!blob) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
+
+    // Convert Blob to File (Fix)
+    const file = new File([blob], "audio.wav", { type: blob.type })
 
     const transcription = await openai.audio.transcriptions.create({
       file: file,
@@ -31,4 +34,3 @@ export const config = {
     bodyParser: false,
   },
 }
-

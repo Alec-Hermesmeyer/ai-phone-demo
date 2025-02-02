@@ -5,7 +5,7 @@ import { Database } from "../../../../lib/supabase/types";
 
 export async function GET() {
   try {
-    const cookieStore = await cookies(); // ✅ Fix: Await cookies() before using it
+    const cookieStore = cookies(); // ✅ FIX: Do not await cookies()
     const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore });
 
     const {
@@ -35,7 +35,7 @@ export async function GET() {
 
 export async function PUT(req: Request) {
   try {
-    const cookieStore = await cookies(); // ✅ Fix: Await cookies() before using it
+    const cookieStore = cookies(); // ✅ FIX: Do not await cookies()
     const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore });
 
     const {

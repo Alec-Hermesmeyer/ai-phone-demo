@@ -42,7 +42,7 @@ export async function POST(req: Request) {
 
     // Gather customer input
     twiml.gather({
-      input: "speech",
+      input: ["speech"], // Wrap in array
       action: "/api/calls/handle-response",
       method: "POST",
       speechTimeout: "auto",

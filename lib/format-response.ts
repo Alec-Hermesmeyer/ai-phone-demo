@@ -29,7 +29,7 @@ export async function formatKnowledgeResponse(content: string, query: string): P
       ],
     })
 
-    const { text } = await result.toResponse()
+    const { text } = await result.response()
     return text
   } catch (error) {
     console.error("Error formatting response:", error)

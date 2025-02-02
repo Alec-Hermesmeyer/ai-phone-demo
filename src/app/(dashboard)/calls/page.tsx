@@ -2,7 +2,7 @@ import { Suspense } from "react"
 import { ActiveCalls } from "./components/active-calls"
 import { CallHistory } from "./components/call-history"
 import { CallStats } from "./components/call-stats"
-import { CallsLoading } from "./loading"
+import { CallsLoading } from "./loading.tsx"
 
 export default function CallsPage() {
   return (

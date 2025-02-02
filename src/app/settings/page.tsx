@@ -100,8 +100,14 @@ export default function SettingsPage() {
     watch,
   } = form
 
-  const voiceSettings = watch(["voiceType", "speakingRate", "pitch"])
-
+  const voiceSettings = {
+    voiceType: watch("voiceType"),
+    speakingRate: watch("speakingRate"),
+    pitch: watch("pitch"),
+  };
+  
+ 
+  
   useEffect(() => {
     // Fetch current settings
     const fetchSettings = async () => {

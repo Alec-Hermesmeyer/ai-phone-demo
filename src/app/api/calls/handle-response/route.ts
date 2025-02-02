@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import  VoiceResponse  from "twilio/lib/twiml/VoiceResponse"
+import VoiceResponse from "twilio/lib/twiml/VoiceResponse"
 import { prisma } from "@/lib/db"
 import { openai } from "@ai-sdk/openai"
 import { streamText } from "ai"
@@ -55,11 +55,13 @@ export async function POST(req: Request) {
           content: speechResult,
         },
       ],
-    });
-    
-    // Ensure aiResponse is a string
-    const aiResponse = await aiResponseResult.text();
-    
+    })
+
+    // Properly handle the text stream
+    let aiResponse = ''
+    for await (const delta of aiResponseResult.textStream) {
+      aiResponse += delta
+    }
 
     // Update call record with RAG metrics
     await prisma.call.update({
@@ -84,17 +86,17 @@ export async function POST(req: Request) {
           voice: call.company.settings?.voiceType || "neural",
           language: "en-US",
         },
-        "I apologize, but I'll need to transfer you to a human agent for better assistance.",
+        "I apologize, but I'll need to transfer you to a human agent for better assistance."
       )
 
-      twiml.dial(call.company.settings?.fallbackNumber || process.env.FALLBACK_PHONE_NUMBER)
+      twiml.dial(call.company.settings?.fallbackNumber || process.env.FALLBACK_PHONE_NUMBER!)
     } else {
       twiml.say(
         {
           voice: call.company.settings?.voiceType || "neural",
           language: "en-US",
         },
-        aiResponse,
+        aiResponse
       )
 
       // Gather next response
@@ -116,7 +118,7 @@ export async function POST(req: Request) {
     console.error("Error handling response:", error)
     const twiml = new VoiceResponse()
     twiml.say("I apologize, but I need to transfer you to a human operator.")
-    twiml.dial(process.env.FALLBACK_PHONE_NUMBER)
+    twiml.dial(process.env.FALLBACK_PHONE_NUMBER!)
     return new NextResponse(twiml.toString(), {
       headers: {
         "Content-Type": "text/xml",
@@ -124,4 +126,3 @@ export async function POST(req: Request) {
     })
   }
 }
-

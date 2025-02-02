@@ -29,11 +29,15 @@ export async function formatKnowledgeResponse(content: string, query: string): P
       ],
     })
 
-    const { text } = await result.response()
+    // Properly handle the stream and accumulate the text
+    let text = ''
+    for await (const delta of result.textStream) {
+      text += delta
+    }
+    
     return text
   } catch (error) {
     console.error("Error formatting response:", error)
     return content // Fallback to original content if formatting fails
   }
 }
-

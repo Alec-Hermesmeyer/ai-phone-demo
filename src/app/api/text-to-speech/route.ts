@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-const ELEVEN_LABS_API_KEY = process.env.ELEVEN_LABS_API_KEY
+const ELEVEN_LABS_API_KEY = process.env.ELEVEN_LABS_API_KEY || ""; // Ensure it's always a string
 
 if (!ELEVEN_LABS_API_KEY) {
   throw new Error("Missing ELEVEN_LABS_API_KEY environment variable")
@@ -14,8 +14,8 @@ export async function POST(req: Request) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "xi-api-key": ELEVEN_LABS_API_KEY,
-      },
+        "xi-api-key": ELEVEN_LABS_API_KEY as string, // Ensure it's a string
+      } as HeadersInit, // Explicitly set type
       body: JSON.stringify({
         text,
         model_id: "eleven_monolingual_v1",
@@ -43,4 +43,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to convert text to speech" }, { status: 500 })
   }
 }
-

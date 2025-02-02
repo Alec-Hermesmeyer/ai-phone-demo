@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase/supabaseClient"
 import type { CallStatus } from "@/lib/twilio";
 import { sendNotification } from "@/lib/notifications";
 
 // Initialize Supabase client
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
+
 
 export async function POST(req: Request) {
   try {

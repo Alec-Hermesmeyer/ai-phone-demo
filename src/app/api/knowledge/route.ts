@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { getCurrentCompany } from "@/lib/auth";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase/supabaseClient"
 
 // Initialize Supabase client
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
+
 
 export async function GET() {
   try {

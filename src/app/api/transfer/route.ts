@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { twilioClient } from "@/lib/twilio";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase/supabaseClient"; // ✅ Ensure correct path
+
 
 // Initialize Supabase client
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
 
 interface Call {
   callSid: string;

@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import twilio from "twilio";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase/supabaseClient"
 import { openai } from "@ai-sdk/openai";
 import { streamText } from "ai";
 
 const VoiceResponse = twilio.twiml.VoiceResponse;
 
 // Initialize Supabase client
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
+
 
 export async function POST(req: Request) {
   try {

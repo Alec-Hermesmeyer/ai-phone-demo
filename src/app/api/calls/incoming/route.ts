@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import  VoiceResponse  from "twilio/lib/twiml/VoiceResponse"
-import { prisma } from "@/lib/db"
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {

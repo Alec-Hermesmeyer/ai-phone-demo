@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import twilio from "twilio"
-import { prisma } from "@/lib/db"
+import { prisma } from "@/lib/prisma";
 import { openai } from '@ai-sdk/openai'
 import { streamText } from 'ai'
 

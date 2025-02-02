@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import VoiceResponse from "twilio/lib/twiml/VoiceResponse"
-import { prisma } from "@/lib/db"
+import { prisma } from "@/lib/prisma";
 import { openai } from "@ai-sdk/openai"
 import { streamText } from "ai"
 import { ragClient } from "@/lib/rag"

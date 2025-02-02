@@ -1,38 +1,50 @@
-import { NextResponse } from "next/server"
-import { getCurrentCompany } from "@/lib/auth"
-import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { getCurrentCompany } from "@/lib/auth";
+import { createClient } from "@supabase/supabase-js";
+
+// Initialize Supabase client
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!);
 
 export async function GET() {
   try {
-    const company = await getCurrentCompany()
+    const company = await getCurrentCompany();
 
-    const items = await prisma.knowledgeItem.findMany({
-      where: {
-        companyId: company.id,
-      },
-    })
+    // Fetch knowledge items from Supabase
+    const { data: items, error } = await supabase
+      .from("knowledgeItem")
+      .select("*")
+      .eq("companyId", company.id);
 
-    return NextResponse.json(items)
+    if (error) {
+      throw new Error("Failed to fetch knowledge items");
+    }
+
+    return NextResponse.json(items);
   } catch (error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    console.error("Error fetching knowledge items:", error);
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 }
 
 export async function POST(req: Request) {
   try {
-    const company = await getCurrentCompany()
-    const data = await req.json()
+    const company = await getCurrentCompany();
+    const data = await req.json();
 
-    const item = await prisma.knowledgeItem.create({
-      data: {
-        companyId: company.id,
-        ...data,
-      },
-    })
+    // Insert new knowledge item into Supabase
+    const { data: item, error } = await supabase
+      .from("knowledgeItem")
+      .insert([{ companyId: company.id, ...data }])
+      .select()
+      .single();
 
-    return NextResponse.json(item)
+    if (error) {
+      throw new Error("Failed to create knowledge item");
+    }
+
+    return NextResponse.json(item);
   } catch (error) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    console.error("Error creating knowledge item:", error);
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 }
-

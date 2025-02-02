@@ -7,7 +7,7 @@ import { ragClient } from "@/lib/rag";
 
 // Initialize Supabase client
 
-
+const supabaseUrl = "https://toyvsnymdhiwnywkbufd.supabase.co";
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();

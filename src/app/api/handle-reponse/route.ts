@@ -7,7 +7,7 @@ import { streamText } from "ai";
 const VoiceResponse = twilio.twiml.VoiceResponse;
 
 // Initialize Supabase client
-
+const supabaseUrl = "https://toyvsnymdhiwnywkbufd.supabase.co";
 
 export async function POST(req: Request) {
   try {

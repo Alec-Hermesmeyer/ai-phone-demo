@@ -6,7 +6,7 @@ import { streamText } from "ai";
 
 const VoiceResponse = twilio.twiml.VoiceResponse;
 
-
+const supabaseUrl = "https://toyvsnymdhiwnywkbufd.supabase.co";
 
 export async function POST(req: Request) {
   try {

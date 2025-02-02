@@ -3,7 +3,7 @@ import { getCurrentCompany } from "@/lib/auth";
 import { supabase } from "@/lib/supabase/supabaseClient"
 
 // Initialize Supabase client
-
+const supabaseUrl = "https://toyvsnymdhiwnywkbufd.supabase.co";
 
 export async function GET() {
   try {

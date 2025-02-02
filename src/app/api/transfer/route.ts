@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase/supabaseClient"; // ✅ Ensure correct 
 
 
 // Initialize Supabase client
-
+const supabaseUrl = "https://toyvsnymdhiwnywkbufd.supabase.co";
 interface Call {
   callSid: string;
   companyId: string;

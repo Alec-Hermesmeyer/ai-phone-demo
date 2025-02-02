@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     })
 
     // Generate AI response using RAG context
-    const { text: aiResponse } = await streamText({
+    const aiResponseResult = await streamText({
       model: openai("gpt-4-turbo"),
       messages: [
         {
@@ -55,7 +55,11 @@ export async function POST(req: Request) {
           content: speechResult,
         },
       ],
-    })
+    });
+    
+    // Ensure aiResponse is a string
+    const aiResponse = await aiResponseResult.text();
+    
 
     // Update call record with RAG metrics
     await prisma.call.update({

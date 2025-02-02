@@ -1,5 +1,5 @@
 import * as pdfjsLib from "pdfjs-dist"
-import { parse } from "papaparse"
+import { parse, unparse } from "papaparse"
 import { addDocument } from "./api"
 
 // Initialize PDF.js worker
@@ -65,7 +65,7 @@ export async function processCSV(file: File): Promise<number> {
 }
 
 export function exportFAQs(faqs: any[]) {
-  const csv = parse.unparse(faqs)
+  const csv = unparse(faqs)
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
   const link = document.createElement("a")
   link.href = URL.createObjectURL(blob)

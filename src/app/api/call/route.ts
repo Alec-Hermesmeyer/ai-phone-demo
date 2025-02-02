@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: openai("gpt-4-turbo"),
-    messages: [systemMessage, { role: "user", content: message }],
+    messages:  [{ role: "user", content: message }],
     temperature: 0.7,
   })
 

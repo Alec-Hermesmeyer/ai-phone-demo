@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase/supabaseClient"
 
 // Initialize Supabase client
 
-
+const supabaseUrl = "https://toyvsnymdhiwnywkbufd.supabase.co";
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();

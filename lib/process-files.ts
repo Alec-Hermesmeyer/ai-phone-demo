@@ -27,19 +27,28 @@ export async function processPDF(file: File) {
   return processedPages
 }
 
+// Add type definition for FAQ rows
+interface FAQRow {
+  question?: string;
+  answer?: string;
+  categories?: string;
+}
+
 export async function processCSV(file: File): Promise<number> {
   const text = await file.text()
   return new Promise((resolve, reject) => {
-    parse(text, {
+    parse<FAQRow>(text, {  // Add generic type parameter
       header: true,
       complete: async (results) => {
         try {
           let count = 0
           for (const row of results.data) {
+            // Add type guard to ensure required fields exist
             if (row.question && row.answer) {
               await addDocument(row.answer, {
                 type: "faq",
                 question: row.question,
+                // Add proper type assertion for categories
                 categories: row.categories?.split(",").map((c: string) => c.trim()) || [],
               })
               count++

@@ -49,10 +49,13 @@ const Chart = React.forwardRef<React.ElementRef<typeof ResponsiveContainer>, Cha
 )
 Chart.displayName = "Chart"
 
-const ChartTooltip = React.forwardRef<React.ElementRef<typeof Tooltip>, React.ComponentPropsWithoutRef<typeof Tooltip>>(
-  ({ className, ...props }, ref) => <Tooltip ref={ref} content={<ChartTooltipContent />} {...props} />,
+const ChartTooltip = React.forwardRef<
+  React.ElementRef<typeof Tooltip>, 
+  React.ComponentPropsWithoutRef<typeof Tooltip>
+>(
+  ({ ...props }, ref) => <Tooltip ref={ref} content={<ChartTooltipContent />} {...props} />,
 )
-ChartTooltip.displayName = "ChartTooltip"
+
 
 const ChartTooltipContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (

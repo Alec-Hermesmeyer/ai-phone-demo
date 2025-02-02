@@ -65,7 +65,7 @@ const ChartTooltipContent = React.forwardRef<HTMLDivElement, React.HTMLAttribute
 ChartTooltipContent.displayName = "ChartTooltipContent"
 
 interface ChartContainerProps extends ChartProps {
-  children: React.ReactNode
+  children: React.ReactElement // Ensure children is a valid ReactElement
 }
 
 function ChartContainer({ className, children, config, ...props }: ChartContainerProps) {

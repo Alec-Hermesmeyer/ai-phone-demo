@@ -12,13 +12,16 @@ export async function POST(req: Request) {
     // Fetch call details from Supabase
     const { data: call, error: callError } = await supabase
       .from("call")
-      .select("callSid, companyId, company:companyId ( settings )")
+      .select("callSid, companyId, company:companyId ( id, settings )")
       .eq("callSid", callSid)
-      .single();
+      .maybeSingle(); // ✅ Ensures we get a single object or null
 
     if (callError || !call) {
       return NextResponse.json({ error: "Call not found" }, { status: 404 });
     }
+
+    // Get the settings correctly
+    const companySettings = call.company ? call.company.settings : null;
 
     // Update call in Supabase
     const { error: updateError } = await supabase
@@ -35,7 +38,7 @@ export async function POST(req: Request) {
       twiml: `
         <Response>
           <Say>Transferring you to an agent now.</Say>
-          <Dial>${call.company?.settings?.fallbackNumber || process.env.FALLBACK_PHONE_NUMBER}</Dial>
+          <Dial>${companySettings?.fallbackNumber || process.env.FALLBACK_PHONE_NUMBER}</Dial>
         </Response>
       `,
     });

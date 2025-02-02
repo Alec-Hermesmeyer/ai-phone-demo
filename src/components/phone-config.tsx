@@ -8,6 +8,7 @@ import { KnowledgeBase } from "./knowledge-base"
 import { CallSimulator } from "./call-simulater"
 import { Settings } from "./settings"
 
+
 export function PhoneConfig() {
   const [activeTab, setActiveTab] = useState("knowledge")
 
@@ -79,7 +80,7 @@ export function PhoneConfig() {
           <CallSimulator />
         </TabsContent>
         <TabsContent value="speech">
-          <SpeechTest />
+         
         </TabsContent>
       </Tabs>
     </div>

@@ -59,7 +59,7 @@ export async function processCSV(file: File): Promise<number> {
           reject(error)
         }
       },
-      error: (error) => reject(error),
+      error: (error: unknown) => reject(error),
     })
   })
 }
